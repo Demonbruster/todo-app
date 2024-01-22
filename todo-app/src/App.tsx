@@ -1,6 +1,7 @@
-import { Button, Container, Grid, TextInput } from "@mantine/core"
+import { ActionIcon, Container, Grid, TextInput } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import axios from "./axiosClient"
+import { IconPlus } from "@tabler/icons-react"
 
 
 function App() {
@@ -16,9 +17,12 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmitHandler = (formData: unknown) => {
     const { task } = formData as { task: string }
-    console.log({ formData })
     axios.post("/task", {
       task,
+    }).then((res) => {
+      if (res.data === 'created') {
+        form.reset()
+      }
     })
   }
 
@@ -32,11 +36,10 @@ function App() {
               label="Task name"
               placeholder="Enter your task name"
               {...form.getInputProps('task')}
+              rightSection={
+                <ActionIcon type="submit"> <IconPlus /> </ActionIcon>
+              }
             />
-          </Grid.Col>
-
-          <Grid.Col span={{ md: 12, lg: 3 }} >
-            <Button mt={24} type="submit">Create</Button>
           </Grid.Col>
         </Grid>
       </form>
