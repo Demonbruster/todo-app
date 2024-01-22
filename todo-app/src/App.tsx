@@ -1,34 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ActionIcon, Container, Grid, TextInput } from "@mantine/core"
+import { useForm } from "@mantine/form"
+import axios from "./axiosClient"
+import { IconPlus } from "@tabler/icons-react"
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const form = useForm({
+    initialValues: {
+      task: ""
+    },
+    validate: {
+      task: (value) => value === "" || value === undefined && "Please fill task"
+    }
+  })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onSubmitHandler = (formData: unknown) => {
+    const { task } = formData as { task: string }
+    axios.post("/task", {
+      task,
+    }).then((res) => {
+      if (res.data === 'created') {
+        form.reset()
+      }
+    })
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Container size="lg">
+      <form onSubmit={form.onSubmit((va) => onSubmitHandler(va))}>
+        <Grid>
+          <Grid.Col span={{ md: 12, lg: 8 }}>
+            <TextInput
+              withAsterisk
+              label="Task name"
+              placeholder="Enter your task name"
+              {...form.getInputProps('task')}
+              rightSection={
+                <ActionIcon type="submit"> <IconPlus /> </ActionIcon>
+              }
+            />
+          </Grid.Col>
+        </Grid>
+      </form>
+    </Container>
   )
 }
 
