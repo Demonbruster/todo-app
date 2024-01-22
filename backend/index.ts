@@ -45,12 +45,34 @@ app.post("/task", async (req, res) => {
 
 		await newTask.save();
 
-    return res.send("created")
+		return res.send("created");
 	} catch (ex) {
 		return res.status(500).send({
 			error: ex,
 		});
 	}
+});
+
+app.get("/task", async (req, res) => {
+	return taskModel
+		.find({})
+		.then((result) => res.send(result))
+		.catch((ex) => {
+			return res.status(500).send({
+				error: ex,
+			});
+		});
+});
+
+app.delete("/task/:id", async (req, res) => {
+	const { id } = req.params;
+	
+  return taskModel.findByIdAndDelete(id)
+  .then((result) => res.send(result)).catch((ex) => {
+    return res.status(500).send({
+      error: ex,
+    });
+  })
 });
 
 app.listen(PORT, () => {
