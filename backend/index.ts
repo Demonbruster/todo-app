@@ -64,15 +64,57 @@ app.get("/task", async (req, res) => {
 		});
 });
 
+app.get("/task/:id", async (req, res) => {
+	const { id } = req.params;
+
+	return taskModel
+		.findById(id)
+		.then((result) => res.send(result))
+		.catch((ex) => {
+			return res.status(500).send({
+				error: ex,
+			});
+		});
+});
+
+app.put("/task/:id", async (req, res) => {
+	const { id } = req.params;
+	const { name } = req.body;
+
+	return taskModel
+		.findByIdAndUpdate(id, { name })
+		.then((result) => res.send(result))
+		.catch((ex) => {
+			return res.status(500).send({
+				error: ex,
+			});
+		});
+});
+
+app.post("/task/:id/complete", async (req, res) => {
+	const { id } = req.params;
+
+	return taskModel
+		.findByIdAndUpdate(id, { isCompleted: true })
+		.then((result) => res.send(result))
+		.catch((ex) => {
+			return res.status(500).send({
+				error: ex,
+			});
+		});
+});
+
 app.delete("/task/:id", async (req, res) => {
 	const { id } = req.params;
-	
-  return taskModel.findByIdAndDelete(id)
-  .then((result) => res.send(result)).catch((ex) => {
-    return res.status(500).send({
-      error: ex,
-    });
-  })
+
+	return taskModel
+		.findByIdAndDelete(id)
+		.then((result) => res.send(result))
+		.catch((ex) => {
+			return res.status(500).send({
+				error: ex,
+			});
+		});
 });
 
 app.listen(PORT, () => {

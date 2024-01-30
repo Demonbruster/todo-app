@@ -4,6 +4,7 @@ import App from './App.tsx'
 import '@mantine/core/styles.css';
 
 import { createTheme, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -12,7 +13,9 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <MantineProvider theme={theme}>
-      <App />
+      <ModalsProvider>
+        <App />
+      </ModalsProvider>
     </MantineProvider>
   </React.StrictMode>,
 )
