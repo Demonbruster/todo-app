@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ActionIcon, Alert, Box, Container, Flex, Grid, LoadingOverlay, Modal, Text } from "@mantine/core"
 import { IconCheck, IconEdit, IconTrash } from "@tabler/icons-react"
 import axios from "./axiosClient"
@@ -31,9 +31,9 @@ function App() {
 
   const completeTask = (id: string) => axios.post("/task/" + id + "/complete").then(() => fetchTasks())
 
+  // side effect to fetch list of tasks
   useEffect(() => {
     setIsLoading(true)
-
     fetchTasks().finally(() => setIsLoading(false))
   }, [])
 
@@ -42,6 +42,14 @@ function App() {
   }).catch(err => {
     console.error(err);
   })
+
+  const tasks = useMemo(() => {
+    return {
+      incomplete: listOfTasks.filter(t => !t.isCompleted),
+      complete: listOfTasks.filter(t => t.isCompleted)
+    };
+  }, [listOfTasks])
+
   return (
     <Container size="lg">
       <Modal opened={opened} onClose={close} title="Edit task">
@@ -56,7 +64,28 @@ function App() {
               overlayProps={{ radius: 'sm', blur: 2 }}
               loaderProps={{ color: 'pink', type: 'bars' }}
             />
-            {listOfTasks.map((t, index) => <Alert key={index} my="xs" title={<Text td={t.isCompleted ? "line-through" : undefined}>{t.name}</Text>} variant="light" >
+            <Text>In Complete</Text>
+            {tasks.incomplete.map((t, index) => <Alert key={index} my="xs" title={<Text td={t.isCompleted ? "line-through" : undefined}>{t.name}</Text>} variant="light" >
+              <Flex justify="space-around" w={100}>
+                <ActionIcon onClick={() => deleteTask(t._id)}>
+                  <IconTrash />
+                </ActionIcon>
+                <ActionIcon onClick={() => {
+                  setTask(undefined)
+                  fetchTaskById(t._id).then(() => {
+                    open()
+                  })
+                }}>
+                  <IconEdit />
+                </ActionIcon>
+                <ActionIcon onClick={() => { completeTask(t._id) }}>
+                  <IconCheck />
+                </ActionIcon>
+              </Flex>
+            </Alert>)}
+            <br />
+            <Text>Completed</Text>
+            {tasks.complete.map((t, index) => <Alert key={index} my="xs" title={<Text td={t.isCompleted ? "line-through" : undefined}>{t.name}</Text>} variant="light" >
               <Flex justify="space-around" w={100}>
                 <ActionIcon onClick={() => deleteTask(t._id)}>
                   <IconTrash />
